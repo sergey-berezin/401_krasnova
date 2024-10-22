@@ -87,7 +87,8 @@ namespace NuGetParallelWnd
 
             // Устанавливаем координаты квадрата на Canvas
             Canvas.SetLeft(rect, square.X * 50);
-            Canvas.SetTop(rect, square.Y * 50);
+            //Canvas.SetTop(rect, square.Y * 50);
+            Canvas.SetBottom(rect, square.Y * 50);
 
             // Добавляем квадрат на Canvas
             canvas.Children.Add(rect);

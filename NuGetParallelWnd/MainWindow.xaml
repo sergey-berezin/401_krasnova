@@ -15,7 +15,7 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="7*"/>
         </Grid.ColumnDefinitions>
-        <Canvas Name="canvas" Background="White" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"/>
+        <Canvas Name="canvas" Background="White" Grid.Column="1" Grid.Row="0"/>
 
         <Label Content="Текущий прогресс:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 0"/>
         <TextBlock Name="ProgressTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0, 25, 0, 0" Width="30"/>
