@@ -25,14 +25,24 @@ namespace NuGetParallelWnd
             InitializeComponent();
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
             int count1x1 = int.Parse(((ComboBoxItem)comboBox1x1.SelectedItem).Content.ToString());
             int count2x2 = int.Parse(((ComboBoxItem)comboBox2x2.SelectedItem).Content.ToString());
             int count3x3 = int.Parse(((ComboBoxItem)comboBox3x3.SelectedItem).Content.ToString());
 
             cancellationTokenSource = new CancellationTokenSource();
-            Task.Run(() => RunGeneticAlgorithm(count1x1, count2x2, count3x3, cancellationTokenSource.Token), cancellationTokenSource.Token);
+            try
+            {
+                await Task.Factory.StartNew(() =>
+                {
+                    RunGeneticAlgorithm(count1x1, count2x2, count3x3, cancellationTokenSource.Token);
+                }, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose();
+            }
         }
         private void RunGeneticAlgorithm(int side1, int side2, int side3, CancellationToken token)
         {
@@ -58,7 +68,7 @@ namespace NuGetParallelWnd
                 Dispatcher.Invoke(() =>
                 {
                     DrawSquare(square);
-                });              
+                });
             }
         }
         private void DrawSquare(Square square)
