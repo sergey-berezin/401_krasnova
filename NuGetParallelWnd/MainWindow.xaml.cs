@@ -14,15 +14,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using NuGetSample;
+using System.IO;
+using System.Text.Json;
 
 namespace NuGetParallelWnd
 {
     public partial class MainWindow : Window
     {
+        private const string ExperimentsFilePath = "experiments.json";
+        public List<Experiment> Experiments { get; set; } = new();
+        private GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
         private CancellationTokenSource cancellationTokenSource;
         public MainWindow()
         {
             InitializeComponent();
+            LoadExperiments();
         }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -46,7 +52,7 @@ namespace NuGetParallelWnd
         }
         private void RunGeneticAlgorithm(int side1, int side2, int side3, CancellationToken token)
         {
-            var geneticAlgorithm = new GeneticAlgorithm();
+            geneticAlgorithm = new GeneticAlgorithm();
             // Инициализация популяции
             geneticAlgorithm.InitializePopulation(100, side1, side2, side3);
             // Ограничение на число поколений
@@ -84,23 +90,20 @@ namespace NuGetParallelWnd
                 case 3:
                     color = Brushes.Gold; break;
                 default:
-                    color = Brushes.Gray;       // Цвет по умолчанию
+                    color = Brushes.Gray;
                     break;
             }
             Rectangle rect = new Rectangle
             {
-                Width = square.SideLength * 50,  // Умножаем размер стороны на коэффициент для наглядности
+                Width = square.SideLength * 50,
                 Height = square.SideLength * 50,
-                Stroke = Brushes.Black,    // Черная рамка квадрата
-                Fill = color   // Заполнение квадрата
+                Stroke = Brushes.Black,
+                Fill = color
             };
 
-            // Устанавливаем координаты квадрата на Canvas
             Canvas.SetLeft(rect, square.X * 50);
-            //Canvas.SetTop(rect, square.Y * 50);
             Canvas.SetBottom(rect, square.Y * 50);
 
-            // Добавляем квадрат на Canvas
             canvas.Children.Add(rect);
         }
 
@@ -113,5 +116,93 @@ namespace NuGetParallelWnd
         {
             canvas.Children.Clear();
         }
+
+        private void SaveExperiments()
+        {
+            var json = JsonSerializer.Serialize(Experiments, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(ExperimentsFilePath, json);
+        }
+
+        private void SaveExperiment(Experiment experiment)
+        {
+            Experiments.Add(experiment);
+            SaveExperiments();
+            ExperimentsListBox.ItemsSource = null;
+            ExperimentsListBox.ItemsSource = Experiments;
+        }
+        
+        private void LoadExperiments()
+        {
+            if (File.Exists(ExperimentsFilePath))
+            {
+                var json = File.ReadAllText(ExperimentsFilePath);
+                Experiments = JsonSerializer.Deserialize<List<Experiment>>(json);
+                ExperimentsListBox.ItemsSource = null;
+                ExperimentsListBox.ItemsSource = Experiments;
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var experimentName = Microsoft.VisualBasic.Interaction.InputBox("Введите имя эксперимента:", "Сохранение эксперимента");
+            if (!string.IsNullOrEmpty(experimentName))
+            {
+                var experiment = new Experiment
+                {
+                    Name = experimentName,
+                    Population = geneticAlgorithm.population,
+                    Generation = 0,
+                    MaxGenerations = 1000,
+                };
+                SaveExperiment(experiment);
+            }
+        }
+
+        private void RunLoadedGeneticAlgorithm(Experiment exp, CancellationToken token)
+        {
+            geneticAlgorithm = new GeneticAlgorithm();
+            geneticAlgorithm.population = exp.Population;
+            Solution bestSolution = geneticAlgorithm.Run(1000, token, (generation, bestFitness, bestSolution) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ProgressTextBlock.Text = $"{generation}";
+                    BestMetricTextBlock.Text = $"{bestFitness}";
+                    BestSolution.Text = bestSolution.ToString();
+                });
+            });
+            Dispatcher.Invoke(() =>
+            {
+                canvas.Children.Clear();
+            });
+            foreach (var square in bestSolution.Squares)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    DrawSquare(square);
+                });
+            }
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var selectedExperiment = ExperimentsListBox.SelectedItem as Experiment;
+            if (selectedExperiment != null)
+            {
+                cancellationTokenSource = new CancellationTokenSource();
+                try
+                {
+                    await Task.Factory.StartNew(() =>
+                    {
+                        RunLoadedGeneticAlgorithm(selectedExperiment, cancellationTokenSource.Token);
+                    }, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                }
+                finally
+                {
+                    cancellationTokenSource.Dispose();
+                }
+            }
+        }
+        
     }
 }
