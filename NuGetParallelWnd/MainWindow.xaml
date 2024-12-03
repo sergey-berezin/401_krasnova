@@ -12,23 +12,24 @@
             <RowDefinition Height="44*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="100*"/>
+            <ColumnDefinition Width="541*"/>
+            <ColumnDefinition Width="159*"/>
         </Grid.ColumnDefinitions>
         <Canvas Name="canvas" Background="White" Grid.Column="1" Grid.Row="0"/>
 
-        <Label Content="Текущий прогресс:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 0"/>
+        <Label Content="Текущий прогресс:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Grid.RowSpan="2"/>
         <TextBlock Name="ProgressTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0, 25, 0, 0" Width="30"/>
 
         <!-- Отображение лучшего решения -->
-        <Label Content="Лучшая метрика:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="110, 0, 0, 0"/>
+        <Label Content="Лучшая метрика:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Margin="110,0,0,0" Grid.RowSpan="2"/>
         <TextBlock Name="BestMetricTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="110, 25, 0, 0" Width="30"/>
 
-        <TextBlock Name="BestSolution" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="250, 0, 0, 0" Width="430" Height="80"/>
-        
+        <TextBlock Name="BestSolution" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Margin="250,0,0,0" Width="280" Height="80" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+
         <Button Content="Запуск" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" Width="50" Click="StartButton_Click" Grid.Row="1" Height="20"/>
         <Button Content="Стоп" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,32,0,0" Width="50" Click="StopButton_Click" Grid.Row="1" Height="20"/>
-        <Button Content="Очистка" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,62,0,6" Width="50" Click="ClearButton_Click" Grid.Row="1"/>
+        <Button Content="Очистка" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,62,0,0" Width="50" Click="ClearButton_Click" Grid.Row="1"/>
         <Label Content="Количество&#xD;&#xA;квадратов" HorizontalAlignment="Center" VerticalAlignment="Top" Height="42" Width="74"/>
         <Label Content="со стороной 1" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Height="26" Width="88"/>
         <Label Content="со стороной 2" HorizontalAlignment="Center" Margin="0,100,0,0" VerticalAlignment="Top" Height="26" Width="88"/>
@@ -56,6 +57,10 @@
             <ComboBoxItem Content="4" />
             <ComboBoxItem Content="5" />
         </ComboBox>
+        <Label Grid.Column="2" Content="Сохранённые&#xD;&#xA;эксперименты" HorizontalAlignment="Left" Margin="30,24,0,0" VerticalAlignment="Top"/>
+        <ListBox x:Name="ExperimentsListBox" Grid.Column="2" Margin="30,66,20,127" SelectionMode="Single" DisplayMemberPath="Name"/>
+        <Button Grid.Column="2" Content="Сохранить" HorizontalAlignment="Left" Margin="44,13,0,0" VerticalAlignment="Top" Click="Button_Click" Grid.Row="1"/>
+        <Button Grid.Column="2" Content="Выгрузить" HorizontalAlignment="Left" Margin="45,44,0,0" VerticalAlignment="Top" Grid.Row="1" Click="Button_Click_1"/>
 
     </Grid>
 </Window>

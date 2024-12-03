@@ -5,7 +5,7 @@ namespace NuGetSample
 {
     public class GeneticAlgorithm
     {
-        private List<Solution> population = new ();
+        public List<Solution> population = new ();
         private readonly Random random = new ();
         private object populationLock = new object(); // Для синхронизации доступа к списку популяции
 
